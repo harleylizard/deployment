@@ -1,10 +1,8 @@
 package com.harleylizard.deployment
 
-import com.dynatrace.hash4j.hashing.Hashing
 import com.google.gson.JsonDeserializer
 import com.sun.net.httpserver.Headers
 import com.sun.net.httpserver.HttpServer
-import java.io.InputStream
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.nio.file.Path
@@ -54,16 +52,6 @@ class Properties private constructor(
 
         val Path.make get() = self {
             parent?.takeUnless { Files.isDirectory(it) }?.let { Files.createDirectories(it) }
-        }
-
-        val InputStream.hash get() = use {
-            val hashed = Hashing.murmur3_128().hashBytesTo128Bits(readAllBytes())
-            val bytes = hashed.toByteArray()
-
-            val builder = StringBuilder()
-            bytes.forEach { builder.append(String.format("%02X", it)) }
-
-            builder.toString()
         }
 
         private fun <T> T.self(unit: T.() -> Unit): T {

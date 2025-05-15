@@ -43,7 +43,7 @@ publishing {
             groupId = "com.harleylizard"
             artifactId = "deployment"
             version = "1.0-SNAPSHOT"
-            from(components["kotlin"])
+            from(components["java"])
         }
     }
 }
