@@ -29,14 +29,29 @@ class Manager(
         val page = Page(exchange)
         val body = page.body
 
-        exchange.sendResponseHeaders(MISSING_FILE, -1)
+        val has = bucket.has(path)
+        if (!has) {
+            body.header("404")
+            body.paragraph("File not found $path")
+            page.send(MISSING_FILE)
+            return
+        }
+        val result = bucket.get(path)
+        if (Files.isRegularFile(result)) {
+            val headers = exchange.responseHeaders
+            headers.set("Content-Disposition", "attachment; filename=\"${path.fileName}\"")
+            headers.set("Content-Type", "application/octet-stream")
 
-        //if (!bucket.has(path)) {
-        //    body.header("404")
-        //    body.paragraph("File not found $path")
-        //    page.send(MISSING_FILE)
-        //    return
-        //}
+            exchange.sendResponseHeaders(OK, Files.size(result))
+            Files.newInputStream(result).use {
+                exchange.responseBody.use { body ->
+                    body.write(it.readAllBytes())
+                    body.flush()
+                }
+            }
+        } else {
+            exchange.sendResponseHeaders(NOT_ALLOWED, -1)
+        }
     }
 
     private fun put(exchange: HttpExchange) {
@@ -74,6 +89,5 @@ class Manager(
 
             builder.toString()
         }
-
     }
 }

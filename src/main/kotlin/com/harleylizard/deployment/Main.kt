@@ -9,12 +9,12 @@ import java.nio.file.Paths
 
 fun main(args: Array<String>) {
     val options = Options()
-    options.addRequiredOption("p", "path", true, "Runtime path.")
+    options.addOption("p", "path", true, "Runtime path.")
 
     val parser = DefaultParser()
     val parsed = parser.parse(options, args)
 
-    val path = parsed.getOptionValue("p")?.let { Paths.get(it).make } ?: throw RuntimeException("No runtime path.")
+    val path = parsed.getOptionValue("p", "run")?.let { Paths.get(it).make } ?: throw RuntimeException("No runtime path.")
 
     val gson = GsonBuilder().registerTypeAdapter(Properties::class.java, Properties.deserializer).create()
 

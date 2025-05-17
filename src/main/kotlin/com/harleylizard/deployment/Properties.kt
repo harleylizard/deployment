@@ -3,6 +3,7 @@ package com.harleylizard.deployment
 import com.google.gson.JsonDeserializer
 import com.sun.net.httpserver.Headers
 import com.sun.net.httpserver.HttpServer
+import com.sun.net.httpserver.HttpsServer
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.nio.file.Path
@@ -15,7 +16,7 @@ class Properties private constructor(
     private val password: String,
     val path: String) {
 
-    val spin: HttpServer get() = HttpServer.create(address, 0)
+    val spin: HttpServer get() = HttpsServer.create(address, 0)
 
     fun verify(headers: Headers): Result {
         if (HEADER in headers) {
@@ -50,13 +51,8 @@ class Properties private constructor(
             Properties(address, username, password, path)
         }
 
-        val Path.make get() = self {
+        val Path.make get() = also {
             parent?.takeUnless { Files.isDirectory(it) }?.let { Files.createDirectories(it) }
-        }
-
-        private fun <T> T.self(unit: T.() -> Unit): T {
-            unit(this)
-            return this
         }
 
     }

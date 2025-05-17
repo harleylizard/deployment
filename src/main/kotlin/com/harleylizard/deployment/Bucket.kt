@@ -1,5 +1,6 @@
 package com.harleylizard.deployment
 
+import com.harleylizard.deployment.Library.Companion.getNonNull
 import com.harleylizard.deployment.Library.Companion.libraryOf
 import java.io.InputStream
 import java.nio.file.Files
@@ -16,7 +17,11 @@ class Bucket(private val path: Path) {
         library.save(file)
     }
 
-    fun get(hash: String): Path = file.libraryOf()[hash].let { path.resolve(it) }
+    fun get(artifact: Path): Path = file.libraryOf().inverse.getNonNull(artifact).let { path.resolve(it) }
 
-    fun has(hash: String) = file.libraryOf().takeIf { hash in it }?.let { Files.isRegularFile(path.resolve(it[hash])) } == true
+    fun has(artifact: Path): Boolean {
+        val inverse = file.libraryOf().inverse
+        return artifact in inverse.keys
+    }
+
 }

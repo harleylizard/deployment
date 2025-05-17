@@ -5,8 +5,10 @@ import com.google.gson.JsonObject
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 
 class Library(private val map: MutableMap<String, Path>) {
+    val inverse: Map<Path, String> get() = Collections.unmodifiableMap(map.entries.associate { (key, value) -> value to key })
 
     fun save(path: Path) {
         Files.newBufferedWriter(path).use {
@@ -48,6 +50,6 @@ class Library(private val map: MutableMap<String, Path>) {
             return Library(mutableMapOf())
         }
 
-        private fun <K, V> Map<K, V>.getNonNull(k: K): V = get(k)!!
+        fun <K, V> Map<K, V>.getNonNull(k: K): V = get(k)!!
     }
 }
